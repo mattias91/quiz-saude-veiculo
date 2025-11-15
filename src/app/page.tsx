@@ -159,7 +159,7 @@ export default function Home() {
     setIsSaving(true)
     try {
       const { data, error } = await supabase
-        .from('vehicles')
+        .from('quiz_vehicles')
         .insert([
           {
             nome: quizData.nome,
@@ -1216,15 +1216,43 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="ultimaManutencao" className="text-slate-300">Qual foi a última grande aventura de manutenção que você fez?</Label>
-                        <Textarea
-                          id="ultimaManutencao"
-                          value={quizData.ultimaManutencao}
-                          onChange={(e) => updateField("ultimaManutencao", e.target.value)}
-                          placeholder="Descreva a última manutenção importante..."
-                          className="mt-1 bg-slate-700/50 border-slate-600 text-slate-100 placeholder:text-slate-500"
-                          rows={4}
-                        />
+                        <Label className="text-slate-300 mb-2 block">Seu veículo passou por manutenção grave?</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            type="button"
+                            onClick={() => updateField("ultimaManutencao", "sim")}
+                            className={`relative flex items-center justify-center p-4 rounded-lg border-2 transition-all duration-200 ${
+                              quizData.ultimaManutencao === "sim"
+                                ? 'border-green-500 bg-green-500/10'
+                                : 'border-slate-600 bg-slate-700/30 hover:border-slate-500'
+                            }`}
+                          >
+                            <span className={`font-medium ${
+                              quizData.ultimaManutencao === "sim"
+                                ? 'text-green-400'
+                                : 'text-slate-300'
+                            }`}>
+                              Sim
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => updateField("ultimaManutencao", "nao")}
+                            className={`relative flex items-center justify-center p-4 rounded-lg border-2 transition-all duration-200 ${
+                              quizData.ultimaManutencao === "nao"
+                                ? 'border-green-500 bg-green-500/10'
+                                : 'border-slate-600 bg-slate-700/30 hover:border-slate-500'
+                            }`}
+                          >
+                            <span className={`font-medium ${
+                              quizData.ultimaManutencao === "nao"
+                                ? 'text-green-400'
+                                : 'text-slate-300'
+                            }`}>
+                              Não
+                            </span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
