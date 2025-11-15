@@ -154,6 +154,164 @@ export default function Home() {
     })
   }
 
+  // Validação de campos obrigatórios por step
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1: // Informações Pessoais
+        if (!quizData.nome.trim()) {
+          toast.error("Por favor, preencha seu nome")
+          return false
+        }
+        if (!quizData.email.trim() || !quizData.email.includes("@")) {
+          toast.error("Por favor, preencha um e-mail válido")
+          return false
+        }
+        if (!quizData.whatsapp.trim()) {
+          toast.error("Por favor, preencha seu WhatsApp")
+          return false
+        }
+        if (!quizData.genero) {
+          toast.error("Por favor, selecione seu gênero")
+          return false
+        }
+        return true
+
+      case 2: // Informações do Veículo
+        if (!quizData.tipoVeiculo) {
+          toast.error("Por favor, selecione o tipo de veículo")
+          return false
+        }
+        if (!quizData.marca) {
+          toast.error("Por favor, selecione a marca")
+          return false
+        }
+        if (!quizData.modelo.trim()) {
+          toast.error("Por favor, preencha o modelo")
+          return false
+        }
+        if (!quizData.ano) {
+          toast.error("Por favor, selecione o ano")
+          return false
+        }
+        if (!quizData.quilometragem.trim()) {
+          toast.error("Por favor, preencha a quilometragem")
+          return false
+        }
+        if (!quizData.combustivel) {
+          toast.error("Por favor, selecione o tipo de combustível")
+          return false
+        }
+        if (!quizData.tipoOleo) {
+          toast.error("Por favor, selecione o tipo de óleo")
+          return false
+        }
+        return true
+
+      case 3: // Uso do Veículo
+        if (!quizData.frequenciaUso) {
+          toast.error("Por favor, selecione a frequência de uso")
+          return false
+        }
+        if (quizData.principalUso.length === 0) {
+          toast.error("Por favor, selecione pelo menos um uso principal")
+          return false
+        }
+        return true
+
+      case 4: // Necessidades de Manutenção
+        if (quizData.manutencoesRealizadas.length === 0) {
+          toast.error("Por favor, selecione pelo menos uma opção de manutenção")
+          return false
+        }
+        if (!quizData.frequenciaLembrete) {
+          toast.error("Por favor, selecione a frequência de lembretes")
+          return false
+        }
+        if (quizData.servicosImportantes.length === 0) {
+          toast.error("Por favor, selecione pelo menos um serviço importante")
+          return false
+        }
+        return true
+
+      case 5: // Desafio da Troca de Óleo
+        if (!quizData.kmTrocaOleo.trim()) {
+          toast.error("Por favor, preencha a quilometragem ideal para troca de óleo")
+          return false
+        }
+        if (!quizData.passouKmIdeal) {
+          toast.error("Por favor, responda se passou da quilometragem ideal")
+          return false
+        }
+        return true
+
+      case 6: // Histórico de Manutenção
+        if (!quizData.temHistorico) {
+          toast.error("Por favor, responda se tem histórico de manutenção")
+          return false
+        }
+        if (!quizData.ultimaManutencao) {
+          toast.error("Por favor, responda sobre manutenção grave")
+          return false
+        }
+        return true
+
+      case 7: // Preferências de Manutenção
+        if (!quizData.preferenciaOficina) {
+          toast.error("Por favor, selecione sua preferência de oficina")
+          return false
+        }
+        if (quizData.preocupacoes.length === 0) {
+          toast.error("Por favor, selecione pelo menos uma preocupação")
+          return false
+        }
+        return true
+
+      case 8: // Avaliação do Veículo
+        if (!quizData.estadoGeral) {
+          toast.error("Por favor, avalie o estado geral do veículo")
+          return false
+        }
+        if (!quizData.temProblema) {
+          toast.error("Por favor, responda se há problemas no veículo")
+          return false
+        }
+        if (quizData.temProblema === "sim" && !quizData.descricaoProblema.trim()) {
+          toast.error("Por favor, descreva o problema")
+          return false
+        }
+        return true
+
+      case 9: // Tecnologia e Recursos
+        if (!quizData.sistemaMonitoramento) {
+          toast.error("Por favor, responda sobre sistema de monitoramento")
+          return false
+        }
+        if (!quizData.querDicasPersonalizadas) {
+          toast.error("Por favor, responda se quer dicas personalizadas")
+          return false
+        }
+        return true
+
+      case 10: // Localização
+        if (!quizData.pais) {
+          toast.error("Por favor, selecione seu país")
+          return false
+        }
+        if (!quizData.estado) {
+          toast.error("Por favor, selecione seu estado")
+          return false
+        }
+        if (!quizData.bairro.trim()) {
+          toast.error("Por favor, preencha seu bairro")
+          return false
+        }
+        return true
+
+      default:
+        return true
+    }
+  }
+
   // Salvar dados no Supabase
   const saveToSupabase = async () => {
     setIsSaving(true)
@@ -261,6 +419,13 @@ export default function Home() {
   }
 
   const nextStep = () => {
+    // Validar step atual antes de avançar (exceto step 0 e 11)
+    if (currentStep > 0 && currentStep < 11) {
+      if (!validateStep(currentStep)) {
+        return
+      }
+    }
+
     if (currentStep < totalSteps - 1) {
       setCurrentStep(prev => prev + 1)
     } else {
@@ -849,7 +1014,7 @@ export default function Home() {
 
                     <div className="space-y-4">
                       <div>
-                        <Label htmlFor="nome" className="text-slate-300">Qual é o seu nome?</Label>
+                        <Label htmlFor="nome" className="text-slate-300">Qual é o seu nome? *</Label>
                         <Input
                           id="nome"
                           value={quizData.nome}
@@ -860,7 +1025,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="email" className="text-slate-300">E-mail (para que possamos enviar suas dicas especiais!)</Label>
+                        <Label htmlFor="email" className="text-slate-300">E-mail (para que possamos enviar suas dicas especiais!) *</Label>
                         <Input
                           id="email"
                           type="email"
@@ -872,7 +1037,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="whatsapp" className="text-slate-300">Número Principal de WhatsApp</Label>
+                        <Label htmlFor="whatsapp" className="text-slate-300">Número Principal de WhatsApp *</Label>
                         <Input
                           id="whatsapp"
                           value={quizData.whatsapp}
@@ -883,7 +1048,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label className="text-slate-300">Qual é o seu gênero?</Label>
+                        <Label className="text-slate-300">Qual é o seu gênero? *</Label>
                         <RadioGroup value={quizData.genero} onValueChange={(value) => updateField("genero", value)} className="mt-2">
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="masculino" id="masculino" />
@@ -913,7 +1078,7 @@ export default function Home() {
 
                     <div className="space-y-4">
                       <div>
-                        <Label htmlFor="tipoVeiculo" className="text-slate-300">Qual tipo de veículo você possui?</Label>
+                        <Label htmlFor="tipoVeiculo" className="text-slate-300">Qual tipo de veículo você possui? *</Label>
                         <Select value={quizData.tipoVeiculo} onValueChange={(value) => updateField("tipoVeiculo", value)}>
                           <SelectTrigger className="mt-1 bg-slate-700/50 border-slate-600 text-slate-100">
                             <SelectValue placeholder="Selecione o tipo" />
@@ -930,7 +1095,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="marca" className="text-slate-300">Qual é a marca do seu fiel escudeiro?</Label>
+                        <Label htmlFor="marca" className="text-slate-300">Qual é a marca do seu fiel escudeiro? *</Label>
                         <Select value={quizData.marca} onValueChange={(value) => updateField("marca", value)}>
                           <SelectTrigger className="mt-1 bg-slate-700/50 border-slate-600 text-slate-100">
                             <SelectValue placeholder="Selecione a marca" />
@@ -951,7 +1116,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="modelo" className="text-slate-300">Modelo do veículo (o seu carro dos sonhos!)</Label>
+                        <Label htmlFor="modelo" className="text-slate-300">Modelo do veículo (o seu carro dos sonhos!) *</Label>
                         <Input
                           id="modelo"
                           value={quizData.modelo}
@@ -962,7 +1127,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="ano" className="text-slate-300">Ano do veículo (quando ele chegou ao mundo)</Label>
+                        <Label htmlFor="ano" className="text-slate-300">Ano do veículo (quando ele chegou ao mundo) *</Label>
                         <Select value={quizData.ano} onValueChange={(value) => updateField("ano", value)}>
                           <SelectTrigger className="mt-1 bg-slate-700/50 border-slate-600 text-slate-100">
                             <SelectValue placeholder="Selecione o ano" />
@@ -976,7 +1141,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="quilometragem" className="text-slate-300">Qual é a quilometragem atual?</Label>
+                        <Label htmlFor="quilometragem" className="text-slate-300">Qual é a quilometragem atual? *</Label>
                         <Input
                           id="quilometragem"
                           value={quizData.quilometragem}
@@ -987,7 +1152,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="combustivel" className="text-slate-300">Tipo de combustível (como o seu carro gosta de se alimentar?)</Label>
+                        <Label htmlFor="combustivel" className="text-slate-300">Tipo de combustível (como o seu carro gosta de se alimentar?) *</Label>
                         <Select value={quizData.combustivel} onValueChange={(value) => updateField("combustivel", value)}>
                           <SelectTrigger className="mt-1 bg-slate-700/50 border-slate-600 text-slate-100">
                             <SelectValue placeholder="Selecione o combustível" />
@@ -1004,7 +1169,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="tipoOleo" className="text-slate-300">Que tipo de óleo você costuma usar?</Label>
+                        <Label htmlFor="tipoOleo" className="text-slate-300">Que tipo de óleo você costuma usar? *</Label>
                         <Select value={quizData.tipoOleo} onValueChange={(value) => updateField("tipoOleo", value)}>
                           <SelectTrigger className="mt-1 bg-slate-700/50 border-slate-600 text-slate-100">
                             <SelectValue placeholder="Selecione o tipo de óleo" />
@@ -1030,7 +1195,7 @@ export default function Home() {
 
                     <div className="space-y-4">
                       <div>
-                        <Label className="text-slate-300 mb-3 block">Com que frequência você usa seu carro?</Label>
+                        <Label className="text-slate-300 mb-3 block">Com que frequência você usa seu carro? *</Label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {[
                             { value: "diariamente", label: "Diariamente" },
@@ -1064,7 +1229,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label className="text-slate-300">Qual é a principal aventura que você faz com seu veículo?</Label>
+                        <Label className="text-slate-300">Qual é a principal aventura que você faz com seu veículo? *</Label>
                         <div className="mt-2 space-y-2">
                           {["Transporte para trabalho", "Lazer", "Viagens longas", "Entregas/Trabalho", "Outros"].map((uso) => (
                             <div key={uso} className="flex items-center space-x-2">
@@ -1092,7 +1257,7 @@ export default function Home() {
 
                     <div className="space-y-4">
                       <div>
-                        <Label className="text-slate-300">Quais manutenções você realizou nos últimos 12 meses?</Label>
+                        <Label className="text-slate-300">Quais manutenções você realizou nos últimos 12 meses? *</Label>
                         <div className="mt-2 space-y-2">
                           {["Troca de óleo", "Troca de pneus", "Verificação de freios", "Alinhamento e balanceamento", "Revisão completa", "Troca de filtros", "Nenhuma"].map((manutencao) => (
                             <div key={manutencao} className="flex items-center space-x-2">
@@ -1108,7 +1273,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="frequenciaLembrete" className="text-slate-300">Com que frequência você quer ser lembrado sobre as manutenções?</Label>
+                        <Label htmlFor="frequenciaLembrete" className="text-slate-300">Com que frequência você quer ser lembrado sobre as manutenções? *</Label>
                         <Select value={quizData.frequenciaLembrete} onValueChange={(value) => updateField("frequenciaLembrete", value)}>
                           <SelectTrigger className="mt-1 bg-slate-700/50 border-slate-600 text-slate-100">
                             <SelectValue placeholder="Selecione a frequência" />
@@ -1124,7 +1289,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label className="text-slate-300">Quais serviços são mais importantes para você?</Label>
+                        <Label className="text-slate-300">Quais serviços são mais importantes para você? *</Label>
                         <div className="mt-2 space-y-2">
                           {["Troca de óleo", "Verificação de freios", "Alinhamento", "Balanceamento", "Troca de pneus", "Revisão elétrica", "Ar condicionado"].map((servico) => (
                             <div key={servico} className="flex items-center space-x-2">
@@ -1152,7 +1317,7 @@ export default function Home() {
 
                     <div className="space-y-4">
                       <div>
-                        <Label htmlFor="kmTrocaOleo" className="text-slate-300">Quantos quilômetros você acha que seu motor precisa para uma troca de óleo perfeita?</Label>
+                        <Label htmlFor="kmTrocaOleo" className="text-slate-300">Quantos quilômetros você acha que seu motor precisa para uma troca de óleo perfeita? *</Label>
                         <Input
                           id="kmTrocaOleo"
                           value={quizData.kmTrocaOleo}
@@ -1163,7 +1328,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label className="text-slate-300">Você já passou da quilometragem ideal para a troca de óleo?</Label>
+                        <Label className="text-slate-300">Você já passou da quilometragem ideal para a troca de óleo? *</Label>
                         <RadioGroup value={quizData.passouKmIdeal} onValueChange={(value) => updateField("passouKmIdeal", value)} className="mt-2">
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="sim" id="passou-sim" />
@@ -1202,7 +1367,7 @@ export default function Home() {
 
                     <div className="space-y-4">
                       <div>
-                        <Label className="text-slate-300">Você tem um diário de bordo das manutenções do seu carro?</Label>
+                        <Label className="text-slate-300">Você tem um diário de bordo das manutenções do seu carro? *</Label>
                         <RadioGroup value={quizData.temHistorico} onValueChange={(value) => updateField("temHistorico", value)} className="mt-2">
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="sim" id="historico-sim" />
@@ -1216,7 +1381,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label className="text-slate-300 mb-2 block">Seu veículo passou por manutenção grave?</Label>
+                        <Label className="text-slate-300 mb-2 block">Seu veículo passou por manutenção grave? *</Label>
                         <div className="grid grid-cols-2 gap-3">
                           <button
                             type="button"
@@ -1268,7 +1433,7 @@ export default function Home() {
 
                     <div className="space-y-4">
                       <div>
-                        <Label className="text-slate-300">Você prefere confiar seu carro em uma oficina de sua escolha ou em uma concessionária oficial?</Label>
+                        <Label className="text-slate-300">Você prefere confiar seu carro em uma oficina de sua escolha ou em uma concessionária oficial? *</Label>
                         <RadioGroup value={quizData.preferenciaOficina} onValueChange={(value) => updateField("preferenciaOficina", value)} className="mt-2">
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="oficinas" id="oficinas" />
@@ -1286,7 +1451,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label className="text-slate-300">O que mais te preocupa quando leva seu carro para manutenção?</Label>
+                        <Label className="text-slate-300">O que mais te preocupa quando leva seu carro para manutenção? *</Label>
                         <div className="mt-2 space-y-2">
                           {["Custo", "Qualidade do serviço", "Tempo de espera", "Confiança na oficina", "Garantia dos serviços", "Outros"].map((preocupacao) => (
                             <div key={preocupacao} className="flex items-center space-x-2">
@@ -1314,7 +1479,7 @@ export default function Home() {
 
                     <div className="space-y-4">
                       <div>
-                        <Label className="text-slate-300">Como você avaliaria o estado geral do seu carro?</Label>
+                        <Label className="text-slate-300">Como você avaliaria o estado geral do seu carro? *</Label>
                         <RadioGroup value={quizData.estadoGeral} onValueChange={(value) => updateField("estadoGeral", value)} className="mt-2">
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="excelente" id="excelente" />
@@ -1336,7 +1501,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label className="text-slate-300">Você já percebeu algum problema estranho recentemente?</Label>
+                        <Label className="text-slate-300">Você já percebeu algum problema estranho recentemente? *</Label>
                         <RadioGroup value={quizData.temProblema} onValueChange={(value) => updateField("temProblema", value)} className="mt-2">
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="sim" id="problema-sim" />
@@ -1351,7 +1516,7 @@ export default function Home() {
 
                       {quizData.temProblema === "sim" && (
                         <div>
-                          <Label htmlFor="descricaoProblema" className="text-slate-300">Descreva o mistério!</Label>
+                          <Label htmlFor="descricaoProblema" className="text-slate-300">Descreva o mistério! *</Label>
                           <Textarea
                             id="descricaoProblema"
                             value={quizData.descricaoProblema}
@@ -1376,7 +1541,7 @@ export default function Home() {
 
                     <div className="space-y-4">
                       <div>
-                        <Label className="text-slate-300">Seu carro possui algum sistema de monitoramento de manutenção?</Label>
+                        <Label className="text-slate-300">Seu carro possui algum sistema de monitoramento de manutenção? *</Label>
                         <RadioGroup value={quizData.sistemaMonitoramento} onValueChange={(value) => updateField("sistemaMonitoramento", value)} className="mt-2">
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="sim" id="sistema-sim" />
@@ -1390,7 +1555,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label className="text-slate-300">Você gostaria de receber dicas personalizadas com base nas tecnologias do seu carro?</Label>
+                        <Label className="text-slate-300">Você gostaria de receber dicas personalizadas com base nas tecnologias do seu carro? *</Label>
                         <RadioGroup value={quizData.querDicasPersonalizadas} onValueChange={(value) => updateField("querDicasPersonalizadas", value)} className="mt-2">
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="sim" id="dicas-sim" />
@@ -1416,7 +1581,7 @@ export default function Home() {
 
                     <div className="space-y-4">
                       <div>
-                        <Label htmlFor="pais" className="text-slate-300">De qual país você é?</Label>
+                        <Label htmlFor="pais" className="text-slate-300">De qual país você é? *</Label>
                         <Select value={quizData.pais} onValueChange={(value) => updateField("pais", value)}>
                           <SelectTrigger className="mt-1 bg-slate-700/50 border-slate-600 text-slate-100">
                             <SelectValue placeholder="Selecione o país" />
@@ -1435,7 +1600,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="estado" className="text-slate-300">Qual estado você reside?</Label>
+                        <Label htmlFor="estado" className="text-slate-300">Qual estado você reside? *</Label>
                         <Select value={quizData.estado} onValueChange={(value) => updateField("estado", value)}>
                           <SelectTrigger className="mt-1 bg-slate-700/50 border-slate-600 text-slate-100">
                             <SelectValue placeholder="Selecione o estado" />
@@ -1451,7 +1616,7 @@ export default function Home() {
                       </div>
 
                       <div>
-                        <Label htmlFor="bairro" className="text-slate-300">Qual bairro você reside?</Label>
+                        <Label htmlFor="bairro" className="text-slate-300">Qual bairro você reside? *</Label>
                         <Input
                           id="bairro"
                           value={quizData.bairro}
